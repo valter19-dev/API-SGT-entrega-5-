@@ -47,20 +47,6 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// healthcheck
-app.get("/health", (_req, res) => {
-  res.json({
-    ok: true,
-    ts: Date.now(),
-    node: process.version,
-    mongoReady: mongoose.connection.readyState,
-    env: {
-      PORT: process.env.PORT,
-      MONGODB_URI: process.env.MONGODB_URI,
-    },
-  });
-});
-
 // Rota principal
 app.get("/", (_req, res) => {
   res.send(
