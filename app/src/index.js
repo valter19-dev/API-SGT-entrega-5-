@@ -61,7 +61,11 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// Rotas
+// Rota principal
+app.get("/", (_req, res) => {
+  res.send("Api SGT Online");
+});
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use("/uploads", express.static(uploadsDir));
 app.use("/auth", authRoutes);
