@@ -1,0 +1,23 @@
+services:
+  curso-node:
+    # Nova imagem construída e tagueada como papadopoli/curso-node:1.1.0
+    image: papadopoli/curso-node:1.1.0 
+    container_name: curso-node
+    ports:
+      - "3000:3000"
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      # Polling é necessário para que o nodemon detecte mudanças em volumes montados
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      # Mapeia o código-fonte local para o contêiner para desenvolvimento ao vivo
+      - ./app:/app
+      # Mapeia o diretório do banco de dados para persistência
+      - ./mongo-data:/data/db
+      # Volume node_modules não é estritamente necessário, mas pode
+      # ser mantido para garantir que o diretório local não interfira.
+      - /app/node_modules 
+    user: "10001:10001"
