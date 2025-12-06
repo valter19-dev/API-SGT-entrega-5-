@@ -63,7 +63,16 @@ app.get("/health", (_req, res) => {
 
 // Rota principal
 app.get("/", (_req, res) => {
-  res.send("Api SGT Online");
+  res.send(
+    <html>
+      <body>
+        <h1>API de Tarefas com MongoDB</h1>
+        <p>
+          Status em <a href="/health">/health</a>
+        </p>
+      </body>
+    </html>
+  );
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
