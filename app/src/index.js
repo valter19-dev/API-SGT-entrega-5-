@@ -47,18 +47,37 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// healthcheck
+app.get("/health", (_req, res) => {
+  res.json({
+    ok: true,
+    ts: Date.now(),
+    node: process.version,
+    mongoReady: mongoose.connection.readyState,
+    env: {
+      PORT: process.env.PORT,
+      MONGODB_URI: process.env.MONGODB_URI,
+    },
+  });
+});
+
 // Rota principal
 app.get("/", (_req, res) => {
-  res.send(
-    <html>
+  const html = `
+    <!DOCTYPE html>
+    <html lang="pt-br">
+      <head>
+        <meta charset="UTF-8" />
+        <title>API-SGT</title>
+      </head>
       <body>
-        <h1>API de Tarefas com MongoDB</h1>
-        <p>
-          Status em <a href="/health">/health</a>
-        </p>
+        <h1>API Gerenciador de Tarefas <strong>online</strong></h1>
+        <p>Status: <a href="/health">/health</a></p>
       </body>
     </html>
-  );
+  `;
+
+  res.send(html);
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
@@ -68,7 +87,7 @@ app.use("/usuarios", usuariosRoutes);
 app.use("/tarefas", tarefasRoutes);
 app.use("/comentarios", comentariosRoutes);
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   logger.error(`${req.method} ${req.originalUrl} - ${err.message}`);
   res.status(500).json({ erro: "Ocorreu um erro inesperado no servidor." });
 });
