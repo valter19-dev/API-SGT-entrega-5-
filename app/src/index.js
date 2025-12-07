@@ -66,91 +66,285 @@ app.get("/", (_req, res) => {
   const html = `
     <!DOCTYPE html>
     <html lang="pt-br">
-      <head>
-        <meta charset="UTF-8" />
-        <title>API-SGT</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fc;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-          }
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="description" content="API SGT Online — Sistema de Gerenciamento de Tarefas com Node.js, Express e MongoDB." />
+      <title>API SGT Online</title>
 
-          .container {
-            background: #fff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 420px;
-            animation: fadeIn 0.6s ease-in-out;
-          }
+      <!-- Fonte moderna -->
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-          h1 {
-            margin-bottom: 10px;
-            font-size: 26px;
-            color: #1a73e8;
-          }
+      <style>
+        body {
+          margin: 0;
+          padding: 40px;
+          font-family: "Inter", sans-serif;
+          background: #ffffff;
+          color: #111827;
+        }
 
-          p {
-            margin: 10px 0 20px;
-            font-size: 18px;
-          }
+        .container {
+          max-width: 850px;
+          margin: auto;
+          text-align: center;
+        }
 
-          a {
-            color: white;
-            background: #1a73e8;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-          }
+        h1 {
+          font-size: 2.6rem;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
 
-          a:hover {
-            background: #155fb8;
-          }
+        p.subtitle {
+          font-size: 1.1rem;
+          color: #6b7280;
+        }
 
-          .footer {
-            margin-top: 20px;
-            font-size: 13px;
-            color: #666;
-          }
+        .links {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 16px;
+          margin-top: 36px;
+        }
 
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        </style>
-      </head>
+        a.button {
+          text-decoration: none;
+          padding: 13px 24px;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 500;
+          border: 1px solid #e5e7eb;
+          background: #fafafa;
+          color: #111;
+          transition: all 0.25s ease;
+        }
 
-      <body>
-        <div class="container">
-          <h1>API Gerenciador de Tarefas</h1>
-          <p><strong>Status do servidor:</strong></p>
+        a.button:hover {
+          background: #f3f4f6;
+          transform: translateY(-2px);
+        }
 
-          <a href="/health">Verificar /health</a>
+        .footer {
+          margin-top: 45px;
+          font-size: 0.85rem;
+          color: #9ca3af;
+        }
 
-          <p class="footer">API hospedada no Render • MongoDB • JWT Auth</p>
+      </style>
+    </head>
+
+    <body>
+      <div class="container">
+        <h1>API SGT Online</h1>
+        <p class="subtitle">Sistema de Gerenciamento de Tarefas — totalmente online<br> hospedado no Render e integrado ao MongoDB Atlas .</p>
+
+        <div class="links">
+          <a href="/api-docs" class="button">📘 Acessar (/api-docs)</a>
+          <a href="/health-ui" class="button">🟢 Status da API</a>
+          <a href="/health" class="button">🔎 Health JSON</a>
         </div>
-      </body>
+
+        <div class="footer">
+          © ${new Date().getFullYear()} — API SGT • Curso Dev Web.  
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  res.send(html);
+});
+
+// Rota do health JSON cru.
+app.get("/health", (_req, res) => {
+  res.json({
+    ok: true,
+    ts: Date.now(),
+    node: process.version,
+    mongoReady: mongoose.connection.readyState,
+    env: {
+      PORT: process.env.PORT,
+      MONGODB_URI: process.env.MONGODB_URI,
+    },
+  });
+});
+
+// Rota status-ui
+app.get("/health-ui", (_req, res) => {
+  const mongoStatus = {
+    0: "Desconectado",
+    1: "Conectado",
+    2: "Conectando",
+    3: "Desconectando",
+  };
+
+  const mongoClass = {
+    0: "bad",
+    1: "good",
+    2: "warn",
+    3: "warn",
+  };
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="Status da API do Sistema de Gerenciamento de Tarefas. Verifique servidor, banco de dados e ambiente." />
+
+      <title>Status da API</title>
+
+      <style>
+        :root {
+          --bg: #f4f6f8;
+          --card: #ffffff;
+          --text: #111;
+          --subtext: #6b7280;
+          --good: #10b981;
+          --bad: #ef4444;
+          --warn: #f59e0b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f3f4f6;
+            --subtext: #9ca3af;
+          }
+        }
+
+        body {
+          margin: 0;
+          font-family: "Inter", sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          padding: 40px 20px;
+        }
+
+        h1 {
+          text-align: center;
+          font-size: 34px;
+          margin-bottom: 35px;
+        }
+
+        .container {
+          max-width: 750px;
+          margin: 0 auto;
+          display: grid;
+          gap: 20px;
+        }
+
+        .card {
+          background: var(--card);
+          padding: 24px;
+          border-radius: 16px;
+          box-shadow: 0 4px 22px rgba(0, 0, 0, 0.06);
+          transition: transform .25s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+        }
+
+        .label {
+          font-size: 14px;
+          color: var(--subtext);
+        }
+
+        .value {
+          font-size: 20px;
+          font-weight: 600;
+          margin-top: 5px;
+        }
+
+        .good { color: var(--good); }
+        .bad  { color: var(--bad); }
+        .warn { color: var(--warn); }
+
+        .footer {
+          margin-top: 40px;
+          text-align: center;
+          font-size: 14px;
+          opacity: .8;
+        }
+
+        a {
+          color: #3b82f6;
+          text-decoration: none;
+        }
+      </style>
+    </head>
+
+    <body>
+      <h1>Status da API</h1>
+
+      <div class="container">
+
+        <div class="card">
+          <div class="label">Servidor</div>
+          <div class="value good">Online ✓</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Data e hora</div>
+          <div class="value">${new Date().toLocaleString("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+          })}</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Node.js</div>
+          <div class="value">${process.version}</div>
+        </div>
+
+        <div class="card">
+          <div class="label">MongoDB</div>
+          <div class="value ${mongoClass[mongoose.connection.readyState]}">
+            ${mongoStatus[mongoose.connection.readyState]}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="label">Porta do servidor</div>
+          <div class="value">${process.env.PORT}</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Banco de dados (URI)</div>
+          <div class="value" style="font-size: 15px; opacity: .8">Confidencial</div>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        Exibir JSON completo: <a href="/health">/health</a>
+      </div>
+    </body>
     </html>
   `;
 
   res.send(html);
 });
 
+// Rota documentação swagger-ui
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+
+// Rota de uploads
 app.use("/uploads", express.static(uploadsDir));
+
+// Rota de atenticação
 app.use("/auth", authRoutes);
+
+// Rota de usuários
 app.use("/usuarios", usuariosRoutes);
+
+// Rota de tarefas
 app.use("/tarefas", tarefasRoutes);
+
+// Rota de comentarios
 app.use("/comentarios", comentariosRoutes);
 
 app.use((err, req, res) => {
