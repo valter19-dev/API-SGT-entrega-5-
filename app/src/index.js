@@ -69,10 +69,76 @@ app.get("/", (_req, res) => {
       <head>
         <meta charset="UTF-8" />
         <title>API-SGT</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+          }
+
+          .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 420px;
+            animation: fadeIn 0.6s ease-in-out;
+          }
+
+          h1 {
+            margin-bottom: 10px;
+            font-size: 26px;
+            color: #1a73e8;
+          }
+
+          p {
+            margin: 10px 0 20px;
+            font-size: 18px;
+          }
+
+          a {
+            color: white;
+            background: #1a73e8;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+          }
+
+          a:hover {
+            background: #155fb8;
+          }
+
+          .footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+          }
+
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        </style>
       </head>
+
       <body>
-        <h1>API Gerenciador de Tarefas <strong>online</strong></h1>
-        <p>Status: <a href="/health">/health</a></p>
+        <div class="container">
+          <h1>API Gerenciador de Tarefas</h1>
+          <p><strong>Status do servidor:</strong></p>
+
+          <a href="/health">Verificar /health</a>
+
+          <p class="footer">API hospedada no Render • MongoDB • JWT Auth</p>
+        </div>
       </body>
     </html>
   `;
